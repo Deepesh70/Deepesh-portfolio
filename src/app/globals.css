@@ -1,26 +1,129 @@
 @import "tailwindcss";
 
+/* ─── Brand Design Tokens ────────────────────────────────── */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: oklch(0 0 0);
+  --primary-hover: oklch(0.3 0 0);
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.965 0.001 286);
+  --secondary-foreground: oklch(0.15 0.004 286);
+
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1 0.005 286);
+
+  --muted: oklch(0.965 0.001 286);
+  --muted-foreground: oklch(0.55 0.01 286);
+
+  --accent: oklch(0.965 0.001 286);
+  --accent-foreground: oklch(0.15 0.004 286);
+
+  --destructive: oklch(0.577 0.245 27.33);
+  --success: oklch(0.648 0.15 160);
+
+  --border: oklch(0.9 0.002 286);
+  --ring: oklch(0.552 0.016 286);
+
+  --radius: 0.5rem;
+  --radius-sm: 0.25rem;
+  --radius-lg: 0.75rem;
 }
+
+.dark {
+  --primary: oklch(1 0 0);
+  --primary-hover: oklch(0.85 0 0);
+  --primary-foreground: oklch(0.1 0.005 286);
+
+  --secondary: oklch(0.22 0.006 286);
+  --secondary-foreground: oklch(0.98 0 0);
+
+  --background: oklch(0.1 0.005 286);
+  --foreground: oklch(0.98 0 0);
+
+  --muted: oklch(0.22 0.006 286);
+  --muted-foreground: oklch(0.6 0.01 286);
+
+  --accent: oklch(0.22 0.006 286);
+  --accent-foreground: oklch(0.98 0 0);
+
+  --destructive: oklch(0.4 0.2 27.33);
+  --success: oklch(0.45 0.15 160);
+
+  --border: oklch(0.25 0.006 286);
+  --ring: oklch(0.55 0.016 286);
+}
+
+/* ─── Tailwind Theme Mapping ─────────────────────────────── */
 
 @theme inline {
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+
+  --font-heading: var(--font-inter);
+  --font-body: var(--font-roboto);
+  --font-mono: var(--font-jetbrains-mono);
+
+  --radius-DEFAULT: var(--radius);
+  --radius-sm: var(--radius-sm);
+  --radius-lg: var(--radius-lg);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base Styles ────────────────────────────────────────── */
+
+* {
+  border-color: var(--border);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), "Roboto", sans-serif;
+  overflow: hidden; /* Desktop OS — no page scroll */
+}
+
+/* ─── Scrollbar Styling (Windows 11 style) ──────────────── */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--muted-foreground);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground);
+}
+
+/* ─── Selection ──────────────────────────────────────────── */
+
+::selection {
+  background: var(--primary);
+  color: var(--primary-foreground);
 }
