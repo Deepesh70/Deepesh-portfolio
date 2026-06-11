@@ -3,8 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { useDesktopStore } from "@/stores/useDesktopStore";
-import { useThemeStore } from "@/stores/useThemeStore";
-import { useSystemTheme } from "@/hooks/useSystemTheme";
 import { Z_INDEX } from "@/lib/constants";
 
 interface LockScreenProps {
@@ -16,13 +14,8 @@ export function LockScreen({ onUnlock }: LockScreenProps) {
   const [date, setDate] = useState("");
   const [showHint, setShowHint] = useState(false);
 
-  // Get wallpaper for lock screen background
-  const mode = useThemeStore((s) => s.mode);
-  const systemTheme = useSystemTheme();
-  const wallpaperLight = useDesktopStore((s) => s.wallpaperLight);
-  const wallpaperDark = useDesktopStore((s) => s.wallpaperDark);
-  const resolvedTheme = mode === "system" ? systemTheme : mode;
-  const wallpaper = resolvedTheme === "dark" ? wallpaperDark : wallpaperLight;
+  // Dedicated lock screen wallpaper (separate from desktop)
+  const lockScreenWallpaper = useDesktopStore((s) => s.lockScreenWallpaper);
 
   // Update clock every second for real-time feel
   useEffect(() => {
@@ -74,12 +67,12 @@ export function LockScreen({ onUnlock }: LockScreenProps) {
       exit={{ y: "-100%", opacity: 0 }}
       transition={{ duration: 0.35, ease: "easeIn" }}
     >
-      {/* Background wallpaper */}
+      {/* Lock screen wallpaper (solid, no transparency) */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url(${wallpaper})`,
-          backgroundColor: resolvedTheme === "dark" ? "#0c0c0c" : "#0078d4",
+          backgroundImage: `url(${lockScreenWallpaper})`,
+          backgroundColor: "#001f3f",
         }}
       />
 
@@ -117,7 +110,7 @@ export function LockScreen({ onUnlock }: LockScreenProps) {
           transition={{ duration: 0.4, delay: 0.4 }}
           className="mt-12 flex flex-col items-center"
         >
-          <div className="w-24 h-24 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/30 flex items-center justify-center mb-3">
+          <div className="w-24 h-24 rounded-full bg-[#0078d4] border-2 border-white/40 flex items-center justify-center mb-3 shadow-lg">
             <span className="text-3xl font-heading font-bold text-white">
               D
             </span>
