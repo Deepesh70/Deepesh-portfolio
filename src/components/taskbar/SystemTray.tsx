@@ -9,7 +9,6 @@ export function SystemTray() {
   const [fullDate, setFullDate] = useState<string>("");
 
   useEffect(() => {
-    // Update immediately on mount
     const updateTime = () => {
       const now = new Date();
       setTime(
@@ -28,20 +27,11 @@ export function SystemTray() {
       );
     };
 
+    // Update immediately, then every 30 seconds
     updateTime();
+    const interval = setInterval(updateTime, 30_000);
 
-    // Sync to the next minute boundary, then update every 60s
-    const msToNextMinute = (60 - new Date().getSeconds()) * 1000;
-    const timeout = setTimeout(() => {
-      updateTime();
-      const interval = setInterval(updateTime, 60_000);
-      // Store interval ID for cleanup
-      (timeout as unknown as { intervalId: number }).intervalId = interval as unknown as number;
-    }, msToNextMinute);
-
-    return () => {
-      clearTimeout(timeout);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   return (

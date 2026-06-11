@@ -20,50 +20,44 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
   const activeWindowId = useWindowStore((s) => s.activeWindowId);
   const focusWindow = useWindowStore((s) => s.focusWindow);
 
-  // If window was removed from store, render nothing
-  if (!windowState) return null;
-
-  const app = getAppById(windowState.appId);
-  if (!app) return null;
-
+  // Derive values safely (use fallbacks so hooks below always run)
+  const appId = windowState?.appId ?? "";
+  const app = getAppById(appId);
   const isActive = activeWindowId === windowId;
-  const isMaximized = windowState.status === "maximized";
-  const isMinimized = windowState.status === "minimized";
+  const isMaximized = windowState?.status === "maximized";
+  const isMinimized = windowState?.status === "minimized";
 
-  // ── Hooks for drag and resize ──────────────────────────
+  // ── ALL hooks must be called before any return ─────────
   const { handleDragStart } = useDrag({
     windowId,
-    isMaximized,
+    isMaximized: isMaximized ?? false,
   });
 
   const { handleResizeStart } = useResize({
     windowId,
-    isMaximized,
-    canResize: app.canResize,
-    minSize: app.minSize,
+    isMaximized: isMaximized ?? false,
+    canResize: app?.canResize ?? false,
+    minSize: app?.minSize,
   });
 
-  // ── Click anywhere on window to focus it ───────────────
   const handleWindowClick = useCallback(() => {
     if (!isActive) {
       focusWindow(windowId);
     }
   }, [isActive, focusWindow, windowId]);
 
-  // Don't render minimized windows (they still exist in the store for taskbar)
+  // ── NOW we can do early returns ────────────────────────
+  if (!windowState || !app) return null;
   if (isMinimized) return null;
 
-  // ── Lazy-load the app component ────────────────────────
   const AppComponent = app.component;
 
   return (
     <motion.div
-      // Animation: scale up slightly when opening
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      // Position and size via CSS transform (GPU accelerated)
       style={{
         position: "absolute",
         transform: `translate(${windowState.position.x}px, ${windowState.position.y}px)`,
@@ -74,19 +68,15 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
       }}
       className={cn(
         "flex flex-col",
-        // Window chrome styling
         !isMaximized && "rounded-lg",
         "border shadow-xl",
-        // Active vs inactive styling
         isActive
           ? "border-border/70 shadow-2xl"
           : "border-border/40 shadow-lg",
-        // Background
         "bg-background"
       )}
       onMouseDown={handleWindowClick}
     >
-      {/* ── Title Bar ──────────────────────────────────── */}
       <TitleBar
         windowId={windowId}
         title={app.title}
@@ -97,7 +87,6 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
         onDragStart={handleDragStart}
       />
 
-      {/* ── App Content Area ───────────────────────────── */}
       <div className="flex-1 overflow-hidden relative">
         <Suspense
           fallback={
@@ -110,10 +99,8 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
         </Suspense>
       </div>
 
-      {/* ── Resize Handles (invisible hit areas on edges) ─ */}
       {app.canResize && !isMaximized && (
         <>
-          {/* Edges — 4px wide invisible strips */}
           <div
             className="absolute top-0 left-2 right-2 h-1 cursor-ns-resize"
             onMouseDown={handleResizeStart("top")}
@@ -130,8 +117,6 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
             className="absolute right-0 top-2 bottom-2 w-1 cursor-ew-resize"
             onMouseDown={handleResizeStart("right")}
           />
-
-          {/* Corners — 8x8px invisible squares */}
           <div
             className="absolute top-0 left-0 w-2 h-2 cursor-nwse-resize"
             onMouseDown={handleResizeStart("top-left")}
