@@ -15,19 +15,16 @@ interface WindowProps {
 }
 
 export const Window = React.memo(function Window({ windowId }: WindowProps) {
-  // ── Subscribe to ONLY this window's state ──────────────
   const windowState = useWindowStore((s) => s.windows.get(windowId));
   const activeWindowId = useWindowStore((s) => s.activeWindowId);
   const focusWindow = useWindowStore((s) => s.focusWindow);
 
-  // Derive values safely (use fallbacks so hooks below always run)
   const appId = windowState?.appId ?? "";
   const app = getAppById(appId);
   const isActive = activeWindowId === windowId;
   const isMaximized = windowState?.status === "maximized";
   const isMinimized = windowState?.status === "minimized";
 
-  // ── ALL hooks must be called before any return ─────────
   const { handleDragStart } = useDrag({
     windowId,
     isMaximized: isMaximized ?? false,
@@ -46,7 +43,6 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
     }
   }, [isActive, focusWindow, windowId]);
 
-  // ── NOW we can do early returns ────────────────────────
   if (!windowState || !app) return null;
   if (isMinimized) return null;
 
@@ -54,17 +50,19 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
 
   return (
     <motion.div
+      // Only animate on mount/unmount — NOT position
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
+      // Use left/top for position (NOT transform — framer-motion owns transform)
       style={{
         position: "absolute",
-        transform: `translate(${windowState.position.x}px, ${windowState.position.y}px)`,
+        left: windowState.position.x,
+        top: windowState.position.y,
         width: windowState.size.width,
         height: windowState.size.height,
         zIndex: Z_INDEX.WINDOWS + windowState.zIndex,
-        willChange: "transform",
       }}
       className={cn(
         "flex flex-col",
