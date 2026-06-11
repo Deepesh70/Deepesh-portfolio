@@ -11,9 +11,10 @@ import type { ThemeMode } from "@/lib/types";
 
 interface StartMenuProps {
   onClose: () => void;
+  onLogout: () => void;
 }
 
-export function StartMenu({ onClose }: StartMenuProps) {
+export function StartMenu({ onClose, onLogout }: StartMenuProps) {
   const openWindow = useWindowStore((s) => s.openWindow);
   const setThemeMode = useThemeStore((s) => s.setMode);
   const currentTheme = useThemeStore((s) => s.mode);
@@ -24,7 +25,6 @@ export function StartMenu({ onClose }: StartMenuProps) {
     onClose();
   };
 
-  // Cycle through themes: system → light → dark → system
   const cycleTheme = () => {
     const next: Record<ThemeMode, ThemeMode> = {
       system: "light",
@@ -40,6 +40,11 @@ export function StartMenu({ onClose }: StartMenuProps) {
     dark: "Dark",
   };
 
+  const handleLogout = () => {
+    onClose();
+    onLogout();
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.96 }}
@@ -50,7 +55,7 @@ export function StartMenu({ onClose }: StartMenuProps) {
       style={{ zIndex: 9500 }}
     >
       <AcrylicPanel className="w-[340px] rounded-lg p-4">
-        {/* ── Profile Section ─────────────────────────── */}
+        {/* Profile Section */}
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
             <span className="text-primary-foreground font-heading font-bold text-sm">
@@ -67,10 +72,9 @@ export function StartMenu({ onClose }: StartMenuProps) {
           </div>
         </div>
 
-        {/* ── Separator ───────────────────────────────── */}
         <div className="h-px bg-border mb-3" />
 
-        {/* ── Pinned Apps Grid ─────────────────────────── */}
+        {/* Pinned Apps Grid */}
         <div className="grid grid-cols-4 gap-1 mb-3">
           {apps.map((app) => (
             <button
@@ -94,10 +98,9 @@ export function StartMenu({ onClose }: StartMenuProps) {
           ))}
         </div>
 
-        {/* ── Separator ───────────────────────────────── */}
         <div className="h-px bg-border mb-3" />
 
-        {/* ── Bottom Actions ───────────────────────────── */}
+        {/* Bottom Actions */}
         <div className="flex items-center justify-between">
           <button
             onClick={cycleTheme}
@@ -108,7 +111,11 @@ export function StartMenu({ onClose }: StartMenuProps) {
               Theme: {themeLabel[currentTheme]}
             </span>
           </button>
-          <button className="flex items-center gap-2 p-2 rounded-sm hover:bg-accent transition-colors">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 p-2 rounded-sm hover:bg-destructive/20 transition-colors"
+            title="Lock screen"
+          >
             <Power size={16} className="text-foreground" />
           </button>
         </div>

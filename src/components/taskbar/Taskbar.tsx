@@ -11,11 +11,14 @@ import { TaskbarApp } from "./TaskbarApp";
 import { SystemTray } from "./SystemTray";
 import { Z_INDEX, TASKBAR_HEIGHT } from "@/lib/constants";
 
-export function Taskbar() {
+interface TaskbarProps {
+  onLogout: () => void;
+}
+
+export function Taskbar({ onLogout }: TaskbarProps) {
   const [startMenuOpen, setStartMenuOpen] = useState(false);
   const windows = useWindowStore((s) => s.windows);
 
-  // Close Start Menu when clicking outside
   const startMenuRef = useClickOutside<HTMLDivElement>(() => {
     setStartMenuOpen(false);
   });
@@ -24,27 +27,26 @@ export function Taskbar() {
     setStartMenuOpen((prev) => !prev);
   }, []);
 
-  // Get all windows sorted by open time for taskbar display
   const windowList = Array.from(windows.values()).sort(
     (a, b) => a.openedAt - b.openedAt
   );
 
   return (
     <>
-      {/* ── Start Menu (above taskbar) ─────────────────── */}
       <AnimatePresence>
         {startMenuOpen && (
           <div ref={startMenuRef}>
-            <StartMenu onClose={() => setStartMenuOpen(false)} />
+            <StartMenu
+              onClose={() => setStartMenuOpen(false)}
+              onLogout={onLogout}
+            />
           </div>
         )}
       </AnimatePresence>
 
-      {/* ── Taskbar Bar ────────────────────────────────── */}
       <div
         className={cn(
           "fixed bottom-0 left-0 right-0 flex items-center justify-between px-2",
-          // Acrylic blur effect
           "bg-black/40 backdrop-blur-2xl",
           "border-t border-white/10"
         )}
@@ -53,7 +55,6 @@ export function Taskbar() {
           zIndex: Z_INDEX.TASKBAR,
         }}
       >
-        {/* Left: Start Button */}
         <button
           onClick={toggleStartMenu}
           className={cn(
@@ -66,14 +67,12 @@ export function Taskbar() {
           <LayoutGrid size={20} className="text-white" />
         </button>
 
-        {/* Center: Running Apps */}
         <div className="flex-1 flex items-center justify-center gap-0.5">
           {windowList.map((win) => (
             <TaskbarApp key={win.id} windowState={win} />
           ))}
         </div>
 
-        {/* Right: System Tray */}
         <SystemTray />
       </div>
     </>
