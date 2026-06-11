@@ -50,16 +50,16 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
 
   return (
     <motion.div
-      // Only animate on mount/unmount — NOT position
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      // Use left/top for position (NOT transform — framer-motion owns transform)
+      // x/y are framer-motion motion values — composed into the same
+      // transform string as scale, so no conflict. GPU-accelerated.
       style={{
         position: "absolute",
-        left: windowState.position.x,
-        top: windowState.position.y,
+        x: windowState.position.x,
+        y: windowState.position.y,
         width: windowState.size.width,
         height: windowState.size.height,
         zIndex: Z_INDEX.WINDOWS + windowState.zIndex,
