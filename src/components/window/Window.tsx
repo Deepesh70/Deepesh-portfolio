@@ -9,6 +9,7 @@ import { useResize } from "@/hooks/useResize";
 import { getAppById } from "@/app/registry";
 import { TitleBar } from "../ui/TitleBar";
 import { Z_INDEX } from "@/lib/constants";
+import { WindowsLoader } from "../ui/windowsLoader";
 
 interface WindowProps {
   windowId: string;
@@ -86,13 +87,14 @@ export const Window = React.memo(function Window({ windowId }: WindowProps) {
       />
 
       <div className="flex-1 overflow-hidden relative">
-        <Suspense
+                <Suspense
           fallback={
-            <div className="flex items-center justify-center h-full">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            <div className="flex items-center justify-center h-full text-muted-foreground">
+              <WindowsLoader size="sm" />
             </div>
           }
         >
+
           <AppComponent />
         </Suspense>
       </div>

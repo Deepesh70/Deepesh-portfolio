@@ -26,6 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 // ─── SEO Metadata ────────────────────────────────────────
 
 export const metadata: Metadata = {
+  metadataBase: new URL("http://localhost:3000"),  //for local dev
   title: "Deepesh | Developer Portfolio",
   description:
     "Interactive Windows 11-style portfolio showcasing projects, skills, and experience. Built with Next.js, React, and TypeScript.",
